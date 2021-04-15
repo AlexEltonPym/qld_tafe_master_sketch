@@ -9,11 +9,9 @@ let poseNet;
 let poses = [];
 const poseThreshold = 0.2;
 let modelStatus = "loading";
-let simPerson;
+let simPeople = [];
+let simPeopleCount = 6;
 let simPersonWalkerSpeed = 10;
-
-const cameraGap = 1450;
-const numCameras = 2;
 
 let pFr = 0;
 
@@ -24,12 +22,13 @@ let nextWalkerSpawn = 0;
 const walkerSpawnCooldown = 100; //milliseconds
 const walkerNoiseScale = 0.005;
 const walkerAgingSpeed = 0.0415;
+const  walker_spawn_offset = 100;
 
 
 const points = [];
 let triangles = [];
 const triangleFadeRate = 0.016;
-const triangleSpawnOffsets = 50;
+const triangleSpawnOffsets = 100;
 let delaunay;
 const maxAllowedEdgeLength = 3200;
 
@@ -58,13 +57,13 @@ let coralGraphicsLayer;
 
 
 
-let state = 4;
+let state = 2;
 let stateNames = ['skelly', 'walkers', 'triangulation', 'fairy', 'coral'];
 let left_transition = 0;
 let right_transition = 0;
 let transitioning = false;
-let transition_speed = 0.005;
-let transition_frequency = 0.2 * 60000; //mins -> millis
+let transition_speed = 0.00003;
+let transition_frequency = 15 * 60000; //mins -> millis
 let last_transition_time = 0;
 let info_font;
 
@@ -73,8 +72,11 @@ function preload(){
   info_font = loadFont("Roboto-Regular.ttf");
 }
 function setup() {
-  createCanvas(4096, 1024, WEBGL);
+  createCanvas(5600, 1280, WEBGL);
 
+  for(let i = 0; i < simPeopleCount; i++){
+    simPeople.push({x: random(width), y: random(height)})
+  }
 
   video = createCapture(VIDEO);
   video.hide();
@@ -86,8 +88,8 @@ function setup() {
   poseNet.on('pose', (results) => {
     poses = results
     
-  for (let extraRepeats = 0; extraRepeats < numCameras; extraRepeats++) {
-    poses.push({pose: {keypoints: [{score: 1, position: {x: simPerson.x + cameraGap * extraRepeats, y: simPerson.y}}]}})
+  for (let simPerson of simPeople) {
+    poses.push({pose: {keypoints: [{score: 1, position: {x: simPerson.x, y: simPerson.y}}]}})
 
   }
     //todo: add centroid here
@@ -99,7 +101,6 @@ function setup() {
 
   colorMode(HSB);
   globalHue = random(360);
-  simPerson = {x: random(width/4), y:random(height)};
 
 
   walkerGraphicsLayer = createGraphics(width, height);
@@ -118,15 +119,16 @@ function setup() {
 
 function draw() {
   translate(-width/2, -height/2)
-  scale(0.3);
+ // scale(0.3);
 
   background(0);
 
   globalHue = (globalHue+hueChangeRate)%360;
-
-  simPerson.x = constrain(simPerson.x + random(-simPersonWalkerSpeed, simPersonWalkerSpeed), 0, width);
-  simPerson.y = constrain(simPerson.y + random(-simPersonWalkerSpeed, simPersonWalkerSpeed), 0, height);
-
+  for(let simPerson of simPeople){
+    simPerson.x = constrain(simPerson.x + random(-simPersonWalkerSpeed, simPersonWalkerSpeed), 0, width);
+    simPerson.y = constrain(simPerson.y + random(-simPersonWalkerSpeed, simPersonWalkerSpeed), 0, height);
+  
+  }
 
   if(modelStatus == "ready"){
     if (stateNames[state] == "skelly") {
@@ -160,10 +162,10 @@ function handleTransition(){
   }
 
   if(transitioning){
-    right_transition = min(right_transition+transition_speed, 1)
+    right_transition = min(right_transition+transition_speed*deltaTime, 1)
 
     if(right_transition > 0.99){
-      left_transition = min(left_transition+transition_speed, 1)
+      left_transition = min(left_transition+transition_speed*deltaTime, 1)
       state = next_state;
     }
 
@@ -179,6 +181,7 @@ function handleTransition(){
   noStroke();
   fill(0);
   rect(left_pos, 0, right_pos, height)
+
 }
 
 function easeInOutQuad(t) { 
@@ -207,9 +210,8 @@ function widgetOverlay(){
 
 function infoOverlay() {
 
-  for (let extraRepeats = 0; extraRepeats < numCameras; extraRepeats++) {
-    image(video, cameraGap * extraRepeats, 1300, video.width, video.height);
-  }
+  image(video, 0, 1300, video.width, video.height);
+  
 
 
   fill(0);
@@ -219,7 +221,7 @@ function infoOverlay() {
   text("Click to view next sketch", 100, height * 2 - 120)
   textSize(72);
 
-  text("Current sketch: " + stateNames[state], 100, height * 2);
+  text("Current sketch: " + stateNames[state] + (transitioning ? " - transitioning":""), 100, height * 2);
   text("Model status: " + modelStatus, 100, height * 2 + 120)
   text(modelStatus == "ready" ?
     ("Detecting " + poses.length + (poses.length == 1 ? " person" : " people")) : "",
@@ -230,5 +232,5 @@ function infoOverlay() {
 
 
 function mousePressed() {
-  triggerTransition();
+  state = (state + 1) % stateNames.length;
 }

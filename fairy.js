@@ -22,10 +22,9 @@ class FairyParticle {
 function run_fairy() {
   for (let p of poses) {
     for (let keypoint of p.pose.keypoints) {
-      for (let extraRepeats = 0; extraRepeats < numCameras; extraRepeats++) {
         if (keypoint.score > poseThreshold) {
 
-          let keyX = keypoint.position.x + cameraGap * extraRepeats;
+          let keyX = keypoint.position.x;
           let keyY = keypoint.position.y;
 
           trail.push({ x: keyX, y: keyY });
@@ -86,7 +85,7 @@ function run_fairy() {
           }
         }
       }
-    }
+    
   }
 }
 

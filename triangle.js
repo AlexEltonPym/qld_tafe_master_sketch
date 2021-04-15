@@ -130,13 +130,12 @@ function spawnAtPoint(requestX, requestY) {
   let spawnY = random(requestY - triangleSpawnOffsets, requestY + triangleSpawnOffsets);
 
 
-  for (let extraRepeats = 0; extraRepeats < numCameras; extraRepeats++) {
 
-    let attempt = new Point(spawnX + cameraGap * extraRepeats, spawnY);
+    let attempt = new Point(spawnX, spawnY);
     if (attempt.viableSpot) {
       points.push(attempt)
     }
-  }
+  
 }
 
 const reducerCount = (accumulator, item) => {

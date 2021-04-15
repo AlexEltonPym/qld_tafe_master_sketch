@@ -12,23 +12,14 @@ function run_walkers(){
 }
 
 
-function spawnWalkers(){
-   if (millis() > nextWalkerSpawn) {
-
-    spawnWalkersFromPoses();
-    nextWalkerSpawn = millis() + walkerSpawnCooldown;
-  }
-}
-
-function spawnWalkersFromPoses() {
+function spawnWalkers() {
   for (let p of poses) {
     for (let keypoint of p.pose.keypoints) {
       if (keypoint.score > poseThreshold) {
-        let spawnX = random(keypoint.position.x - 30, keypoint.position.x + 30);
-        let spawnY = random(keypoint.position.y - 30, keypoint.position.y + 30);
-        for (let extraRepeats = 0; extraRepeats < numCameras; extraRepeats++) {
-          walkers.push(new Walker(spawnX + cameraGap * extraRepeats, spawnY));
-        }
+        let spawnX = random(keypoint.position.x - walker_spawn_offset, keypoint.position.x + walker_spawn_offset);
+        let spawnY = random(keypoint.position.y - walker_spawn_offset, keypoint.position.y + walker_spawn_offset);
+        walkers.push(new Walker(spawnX, spawnY));
+        
       }
     }
   }
