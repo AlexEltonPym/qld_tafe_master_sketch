@@ -63,7 +63,9 @@ let stateNames = ['skelly', 'walkers', 'triangulation', 'fairy', 'coral'];
 let left_transition = 0;
 let right_transition = 0;
 let transitioning = false;
-
+let transition_speed = 0.005;
+let transition_frequency = 0.2 * 60000; //mins -> millis
+let last_transition_time = 0;
 let info_font;
 
 function preload(){
@@ -72,6 +74,7 @@ function preload(){
 }
 function setup() {
   createCanvas(4096, 1024, WEBGL);
+
 
   video = createCapture(VIDEO);
   video.hide();
@@ -138,9 +141,9 @@ function draw() {
       run_coral();
     }
   }
+  handleTransition();
 
   widgetOverlay();
-  handleTransition();
   
 
   infoOverlay();
@@ -151,11 +154,16 @@ function draw() {
 
 function handleTransition(){
 
+  if(last_transition_time + transition_frequency < millis()){
+    triggerTransition();
+    last_transition_time = millis();
+  }
+
   if(transitioning){
-    right_transition = lerp(right_transition, 1, transition_speed);
+    right_transition = min(right_transition+transition_speed, 1)
 
     if(right_transition > 0.99){
-      left_transition = lerp(left_transition, 1, transition_speed)
+      left_transition = min(left_transition+transition_speed, 1)
       state = next_state;
     }
 
@@ -164,6 +172,18 @@ function handleTransition(){
     }
   }
 
+  let left_pos = easeInOutQuad(left_transition) * width;
+  let right_pos = easeInOutQuad(right_transition) * width;
+
+
+  noStroke();
+  fill(0);
+  rect(left_pos, 0, right_pos, height)
+}
+
+function easeInOutQuad(t) { 
+  //return t<0.5 ? 2*t*t : -1+(4-2*t)*t
+  return t;
 }
 
 function triggerTransition(){
