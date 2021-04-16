@@ -10,8 +10,8 @@ let poses = [];
 const poseThreshold = 0.2;
 let modelStatus = "loading";
 let simPeople = [];
-let simPeopleCount = 6;
-let simPersonWalkerSpeed = 10;
+let simPeopleCount =10;
+let simPersonWalkerSpeed = 50;
 
 let pFr = 0;
 
@@ -30,7 +30,7 @@ let triangles = [];
 const triangleFadeRate = 0.001;
 const triangleSpawnOffsets = 100;
 let delaunay;
-const maxAllowedEdgeLength = 2000000;
+const maxAllowedEdgeLength = 30000;
 
 
 let trail = [];

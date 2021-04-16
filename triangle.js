@@ -100,7 +100,7 @@ function draw_triangles() {
     );
 
 
-    if (biggestEdge < 10000) {
+    if (biggestEdge < maxAllowedEdgeLength) {
 
     let mostFadedAlpha = 255;
     let mostFadedColor;
