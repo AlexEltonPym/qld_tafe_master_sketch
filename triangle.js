@@ -25,8 +25,8 @@ class Point {
 
     this.viableSpot = true;
     for (let p of points) {
-      let d = dist(this.x, this.y, p.x, p.y);
-      if (d < (this.r + p.r) * 3) {
+      let d = ((this.x-p.x)*(this.x-p.x)) + ((this.y-p.y)*(this.y-p.y));
+      if (d < 2000) {
         this.viableSpot = false;
         return;
       }
@@ -49,18 +49,18 @@ class Point {
 
     this.fillCol.setAlpha(color_a);
 
-    for (let i = 0; i < poses.length; i++) {
-      let pose = poses[i].pose;
-      for (let j = 0; j < pose.keypoints.length; j++) {
-        let keypoint = pose.keypoints[j];
-        if (keypoint.score > poseThreshold) {
-          let d = dist(this.x, this.y, keypoint.position.x, keypoint.position.y)
-          if (d < triangleSpawnOffsets ) {
-            this.fade = max(this.fade, 0.5);
-          }
-        }
-      }
-    }
+    // for (let i = 0; i < poses.length; i++) {
+    //   let pose = poses[i].pose;
+    //   for (let j = 0; j < pose.keypoints.length; j++) {
+    //     let keypoint = pose.keypoints[j];
+    //     if (keypoint.score > poseThreshold) {
+    //       let d = ((this.x-keypoint.position.x)*(this.x-keypoint.position.x)) + ((this.y-keypoint.position.y)*(this.y-keypoint.position.y))
+    //       if (d < triangleSpawnOffsets) {
+    //         this.fade = max(this.fade, 0.5);
+    //       }
+    //     }
+    //   }
+    // }
   }
 
 
@@ -99,12 +99,26 @@ function draw_triangles() {
       sq(c[2].x - c[0].x) + sq(c[2].y - c[0].y)
     );
 
-    if (biggestEdge < maxAllowedEdgeLength) {
-      fill(c[0].fillCol)
+
+    if (biggestEdge < 10000) {
+
+    let mostFadedAlpha = 255;
+    let mostFadedColor;
+
+    for(let i = 0; i < 3; i++) {
+      if(alpha(c[i].fillCol) < mostFadedAlpha){
+        mostFadedAlpha = alpha(c[i].fillCol);
+        mostFadedColor = c[i].fillCol;
+      }
+    }
+
+
+
+      fill(mostFadedColor)
       strokeWeight(0.2)
       stroke(0);
       triangle(c[0].x, c[0].y, c[1].x, c[1].y, c[2].x, c[2].y);
-    }
+     }
   }
 
 }
@@ -117,10 +131,10 @@ function spawnPoints() {
       }
     }
 
-    let cCount = p.pose.keypoints.reduce(reducerCount, 0);
-    let cX = p.pose.keypoints.reduce(reducerX, 0) / cCount;
-    let cY = p.pose.keypoints.reduce(reducerY, 0) / cCount;
-    spawnAtPoint(cX, cY)
+    // let cCount = p.pose.keypoints.reduce(reducerCount, 0);
+    // let cX = p.pose.keypoints.reduce(reducerX, 0) / cCount;
+    // let cY = p.pose.keypoints.reduce(reducerY, 0) / cCount;
+    // spawnAtPoint(cX, cY)
   }
 
 }
@@ -128,8 +142,6 @@ function spawnPoints() {
 function spawnAtPoint(requestX, requestY) {
   let spawnX = random(requestX - triangleSpawnOffsets, requestX + triangleSpawnOffsets);
   let spawnY = random(requestY - triangleSpawnOffsets, requestY + triangleSpawnOffsets);
-
-
 
     let attempt = new Point(spawnX, spawnY);
     if (attempt.viableSpot) {

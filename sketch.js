@@ -27,10 +27,10 @@ const  walker_spawn_offset = 100;
 
 const points = [];
 let triangles = [];
-const triangleFadeRate = 0.016;
+const triangleFadeRate = 0.001;
 const triangleSpawnOffsets = 100;
 let delaunay;
-const maxAllowedEdgeLength = 3200;
+const maxAllowedEdgeLength = 2000000;
 
 
 let trail = [];
