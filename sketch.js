@@ -4,6 +4,7 @@ let hueChangeRate = 1;
 let sat = 100;
 let bright = 100;
 
+const systemHasWebcam = false;
 let video;
 let poseNet;
 let poses = [];
@@ -11,7 +12,7 @@ const poseThreshold = 0.2;
 let modelStatus = "loading";
 let simPeople = [];
 let simPeopleCount =10;
-let simPersonWalkerSpeed = 50;
+let simPersonWalkerSpeed = 4;
 
 let pFr = 0;
 
@@ -42,22 +43,16 @@ let fairyShaderTexture;
 let fairyShader;
 let fairiesShaded = false;
 
-let corals = [];
-const coral_size = 25;
-const coral_length = 20;
-const coralOffsetA = 1;
-const coralOffsetB = 4;
-const coral_noise_scale = 1000;
-const coral_evolution_speed = 0.004;
-const coral_fast_evolution_speed = 0.01;
-const coral_return_ease = 0.03;
-const coral_disturb_distance = 150;
-let coral_base_z = 0;
-let coralGraphicsLayer;
+let coral_shader;
+let coral_graphics_layer;
+const coral_noise_scale = 2;
+const coral_grid_scale = 20;
+const coral_disturb_dist = 400;
+let coral_keypoints_x = [];
+let coral_keypoints_y = [];
 
 
-
-let state = 2;
+let state = 4;
 let stateNames = ['skelly', 'walkers', 'triangulation', 'fairy', 'coral'];
 let left_transition = 0;
 let right_transition = 0;
@@ -69,31 +64,35 @@ let info_font;
 
 function preload(){
 
-  info_font = loadFont("Roboto-Regular.ttf");
+  info_font = loadFont('Roboto-Regular.ttf');
+  coral_shader = loadShader('coral_base.vert', 'coral_shader.frag');
 }
+
 function setup() {
   createCanvas(5600, 1280, WEBGL);
-
+  frameRate(30);
   for(let i = 0; i < simPeopleCount; i++){
     simPeople.push({x: random(width), y: random(height)})
   }
 
-  video = createCapture(VIDEO);
-  video.hide();
+  if(systemHasWebcam){
+    video = createCapture(VIDEO);
+    video.hide();
 
-  poseNet = ml5.poseNet(video, () => {
-    console.log('Ready!')
-    modelStatus = "ready";
-  });
-  poseNet.on('pose', (results) => {
-    poses = results
-    
-  for (let simPerson of simPeople) {
-    poses.push({pose: {keypoints: [{score: 1, position: {x: simPerson.x, y: simPerson.y}}]}})
+    poseNet = ml5.poseNet(video, () => {
+      console.log('Ready!')
+      modelStatus = "ready";
+    });
+    poseNet.on('pose', (results) => {
+      poses = results
+      
+      for (let simPerson of simPeople) {
+        poses.push({pose: {keypoints: [{score: 1, position: {x: simPerson.x, y: simPerson.y}}]}})
 
+      }
+      //todo: add centroid here
+    });
   }
-    //todo: add centroid here
-  });
 
   background(0);
 
@@ -111,15 +110,28 @@ function setup() {
   fairyShader = fairyShaderTexture.createShader(getFairyVertShader(), getFairyFragShader())
   fairyShaderTexture.noStroke();
 
+
+  coral_graphics_layer = createGraphics(width, height, WEBGL);
+  
+
   noiser.seed(random())
-  spawn_corals();
 }
 
 
 
 function draw() {
+
+  if(!systemHasWebcam){
+    poses = [];
+
+    for (let simPerson of simPeople) {
+      poses.push({pose: {keypoints: [{score: 1, position: {x: simPerson.x, y: simPerson.y}}]}})
+
+    }
+  }
+
+
   translate(-width/2, -height/2)
- // scale(0.3);
 
   background(0);
 
@@ -130,7 +142,7 @@ function draw() {
   
   }
 
-  if(modelStatus == "ready"){
+  if(modelStatus == "ready" || !systemHasWebcam){
     if (stateNames[state] == "skelly") {
       run_skelly();
     } else if (stateNames[state] == "walkers") {
@@ -148,7 +160,7 @@ function draw() {
   widgetOverlay();
   
 
-  infoOverlay();
+ // infoOverlay();
 
 
 
