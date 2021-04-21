@@ -57,7 +57,7 @@ function run_fairy() {
             }
           }
 
-          if (fairiesShaded || keyIsPressed) {
+          if (fairiesShaded) {
             fairyShaderTexture.shader(fairyShader);
 
             let data = serializeSketch();
