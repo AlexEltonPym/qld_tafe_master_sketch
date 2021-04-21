@@ -11,7 +11,7 @@ let poses = [];
 const poseThreshold = 0.2;
 let modelStatus = "loading";
 let simPeople = [];
-let simPeopleCount =10;
+let simPeopleCount = 10;
 let simPersonWalkerSpeed = 4;
 
 let pFr = 0;
@@ -216,8 +216,10 @@ function widgetOverlay(){
   rect(0, 0, 300, 200)
   fill(255)
   text(nf(hour(), 2) + ":" + nf(minute(), 2), 100, 100)
-  text(nf((frameRate() + pFr) / 2, 2, 1), 100, 160);
-   pFr = frameRate();
+
+  textSize(42);
+  text("fps: " + int((frameRate() + pFr) / 2), 100, 160);
+  pFr = frameRate();
 }
 
 function infoOverlay() {
