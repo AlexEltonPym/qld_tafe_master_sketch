@@ -17,80 +17,73 @@ class FairyParticle {
   }
 }
 
-
+function setupFairy(){
+  fairyShaderTexture = createGraphics(width, height, WEBGL);
+  fairyShader = fairyShaderTexture.createShader(getFairyVertShader(), getFairyFragShader())
+  fairyShaderTexture.noStroke();
+}
 
 function run_fairy() {
   for (let p of poses) {
     for (let keypoint of p.pose.keypoints) {
-        if (keypoint.score > poseThreshold) {
-
-          let keyX = keypoint.position.x;
-          let keyY = keypoint.position.y;
-
-          trail.push({ x: keyX, y: keyY });
-
-          let removeCount = 1;
-          for (let i = 0; i < removeCount; i++) {
-            if (trail.length == 0) {
-              break;
-            }
-
-            if (trail.length > MAX_TRAIL_COUNT) {
-              trail.splice(0, 1);
-            }
-          }
-
-          // Spawn particles.
-          if (trail.length > 1 && fairies.length < MAX_PARTICLE_COUNT) {
-            let detected = createVector(-width / 2, -height / 2);
-            if (detected.mag() > 10) {
-              detected.normalize();
-              fairies.push(new FairyParticle(keyX, keyY, detected.x, detected.y));
-            }
-          }
-
-          // Move and kill particles.
-          for (let i = fairies.length - 1; i > -1; i--) {
-            fairies[i].move();
-            if (fairies[i].vel.mag() < 0.1) {
-              fairies.splice(i, 1);
-            }
-          }
-
-          if (fairiesShaded) {
-            fairyShaderTexture.shader(fairyShader);
-
-            let data = serializeSketch();
-            fairyShader.setUniform("resolution", [width, height]);
-            fairyShader.setUniform("trailCount", trail.length);
-            fairyShader.setUniform("trail", data.trails);
-            fairyShader.setUniform("particleCount", fairies.length);
-            fairyShader.setUniform("particles", data.particles);
-            fairyShader.setUniform("colors", data.colors);
-
-            fairyShaderTexture.rect(0, 0, width, height);
-            image(fairyShaderTexture, 0, 0);
-          } else {
-            noStroke();
-            for (let f of fairies) {
-              fill(f.fillCol);
-
-              circle(f.pos.x, f.pos.y, 10);
-            }
-
-            fill(180, 100, 100);
-            for (let t of trail) {
-              circle(t.x, t.y, 20);
-            }
-          }
-        }
+      if (keypoint.score > poseThreshold) {
+        update_fairies(keypoint.position.x, keypoint.position.y);
       }
-    
+    }
   }
+  display_shaded_fairies();
+
 }
 
 
+function update_fairies(keyX, keyY){
 
+  trail.push({ x: keyX, y: keyY });
+
+  let removeCount = 1;
+  for (let i = 0; i < removeCount; i++) {
+    if (trail.length == 0) {
+      break;
+    }
+
+    if (trail.length > MAX_TRAIL_COUNT) {
+      trail.splice(0, 1);
+    }
+  }
+
+  // Spawn particles.
+  if (trail.length > 1 && fairies.length < MAX_PARTICLE_COUNT) {
+    let detected = createVector(-width / 2, -height / 2);
+    if (detected.mag() > 10) {
+      detected.normalize();
+      fairies.push(new FairyParticle(keyX, keyY, detected.x, detected.y));
+    }
+  }
+
+  // Move and kill particles.
+  for (let i = fairies.length - 1; i > -1; i--) {
+    fairies[i].move();
+    if (fairies[i].vel.mag() < 0.1) {
+      fairies.splice(i, 1);
+    }
+  }
+
+}
+
+function display_shaded_fairies(){
+  fairyShaderTexture.shader(fairyShader);
+
+  let data = serializeSketch();
+  fairyShader.setUniform("resolution", [width, height]);
+  fairyShader.setUniform("trailCount", trail.length);
+  fairyShader.setUniform("trail", data.trails);
+  fairyShader.setUniform("particleCount", fairies.length);
+  fairyShader.setUniform("particles", data.particles);
+  fairyShader.setUniform("colors", data.colors);
+
+  fairyShaderTexture.rect(0, 0, width, height);
+  image(fairyShaderTexture, 0, 0);
+}
 
 function serializeSketch() {
   let data = {
@@ -173,11 +166,7 @@ function getFairyFragShader() {
 					b += color.b / distance(st, pos) * mult * mass;
 				}
 			}
-			//if(r + b + g < 0.5){
-			//	gl_FragColor = vec4(r/10.0, g/10.0, b/10.0, 1.0);
-			//} else {
-				gl_FragColor = vec4(r, g, b, 1.0);
-			//}
+			gl_FragColor = vec4(r, g, b, 1.0);
 	}
 `;
 }

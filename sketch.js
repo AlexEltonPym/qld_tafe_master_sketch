@@ -23,7 +23,7 @@ let nextWalkerSpawn = 0;
 const walkerSpawnCooldown = 100; //milliseconds
 const walkerNoiseScale = 0.005;
 const walkerAgingSpeed = 0.0415;
-const  walker_spawn_offset = 100;
+const walker_spawn_offset = 100;
 
 
 const points = [];
@@ -41,7 +41,7 @@ const MAX_TRAIL_COUNT = 20;
 const MAX_PARTICLE_COUNT = 40;
 let fairyShaderTexture;
 let fairyShader;
-let fairiesShaded = false;
+let fairiesShaded = true;
 
 let coral_shader;
 let coral_graphics_layer;
@@ -52,13 +52,14 @@ let coral_keypoints_x = [];
 let coral_keypoints_y = [];
 
 
-let state = 4;
+let state = 1;
 let stateNames = ['skelly', 'walkers', 'triangulation', 'fairy', 'coral'];
 let left_transition = 0;
 let right_transition = 0;
 let transitioning = false;
 let transition_speed = 0.00003;
-let transition_frequency = 15 * 60000; //mins -> millis
+
+let transition_frequency = 15 * 60000; //mins * millis in a minute
 let last_transition_time = 0;
 let info_font;
 
@@ -106,10 +107,7 @@ function setup() {
   walkerGraphicsLayer.noStroke();
   walkerGraphicsLayer.background(0, 0, 0);
 
-  fairyShaderTexture = createGraphics(width, height, WEBGL);
-  fairyShader = fairyShaderTexture.createShader(getFairyVertShader(), getFairyFragShader())
-  fairyShaderTexture.noStroke();
-
+  setupFairy();
 
   coral_graphics_layer = createGraphics(width, height, WEBGL);
   
@@ -247,4 +245,5 @@ function infoOverlay() {
 
 function mousePressed() {
   state = (state + 1) % stateNames.length;
+ //triggerTransition();
 }
