@@ -59,14 +59,28 @@ let right_transition = 0;
 let transitioning = false;
 let transition_speed = 0.00003;
 
+
 let transition_frequency = 15 * 60000; //mins * millis in a minute
 let last_transition_time = 0;
 let info_font;
+
+
+let vid;
+let vid_loaded = false
+
 
 function preload(){
 
   info_font = loadFont('Roboto-Regular.ttf');
   coral_shader = loadShader('coral_base.vert', 'coral_shader.frag');
+
+
+  vid = createVideo('noisey_compressed_35.mp4', () => {
+    vid_loaded = true
+    vid.hide();
+    vid.loop();
+    console.log("video playing")
+  });
 }
 
 function setup() {
@@ -113,6 +127,7 @@ function setup() {
   
 
   noiser.seed(random())
+
 }
 
 
@@ -134,6 +149,11 @@ function draw() {
   background(0);
 
   globalHue = (globalHue+hueChangeRate)%360;
+
+
+
+
+
   for(let simPerson of simPeople){
     simPerson.x = constrain(simPerson.x + random(-simPersonWalkerSpeed, simPersonWalkerSpeed), 0, width);
     simPerson.y = constrain(simPerson.y + random(-simPersonWalkerSpeed, simPersonWalkerSpeed), 0, height);
@@ -141,6 +161,10 @@ function draw() {
   }
 
   if(modelStatus == "ready" || !systemHasWebcam){
+if(vid_loaded){
+  image(vid, 0, 0)
+}
+
     if (stateNames[state] == "skelly") {
       run_skelly();
     } else if (stateNames[state] == "walkers") {
@@ -155,12 +179,12 @@ function draw() {
   }
   handleTransition();
 
-  widgetOverlay();
+  
+
+ // widgetOverlay();
   
 
  // infoOverlay();
-
-
 
 }
 
