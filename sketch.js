@@ -11,7 +11,7 @@ let poses = [];
 const poseThreshold = 0.2;
 let modelStatus = "loading";
 let simPeople = [];
-let simPeopleCount = 10;
+let simPeopleCount = 20;
 let simPersonWalkerSpeed = 4;
 
 let pFr = 0;
@@ -23,7 +23,7 @@ let nextWalkerSpawn = 0;
 const walkerSpawnCooldown = 100; //milliseconds
 const walkerNoiseScale = 0.005;
 const walkerAgingSpeed = 0.0415;
-const walker_spawn_offset = 100;
+const walker_spawn_offset = 300;
 
 
 const points = [];
@@ -75,7 +75,7 @@ function preload(){
   coral_shader = loadShader('coral_base.vert', 'coral_shader.frag');
 
 
-  vid = createVideo('noisey_compressed_35.mp4', () => {
+  vid = createVideo('triangle_bg_video.mp4', () => {
     vid_loaded = true
     vid.hide();
     vid.loop();
