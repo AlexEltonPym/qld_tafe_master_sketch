@@ -75,7 +75,7 @@ function preload(){
   coral_shader = loadShader('coral_base.vert', 'coral_shader.frag');
 
 
-  vid = createVideo('triangle_bg_video.mp4', () => {
+  vid = createVideo('white_bg_video.mp4', () => {
     vid_loaded = true
     vid.hide();
     vid.loop();
@@ -162,6 +162,7 @@ function draw() {
 
   if(modelStatus == "ready" || !systemHasWebcam){
 if(vid_loaded){
+  tint(globalHue+50, 100, 50)
   image(vid, 0, 0)
 }
 
