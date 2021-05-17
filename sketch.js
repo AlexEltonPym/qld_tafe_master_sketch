@@ -1,8 +1,9 @@
 const screen = "small";
+const webcams = true;
 
 let globalHue;
 let hueRange = 60;
-let hueChangeRate = 1;
+let hueChangeRate = 0.5;
 let sat = 100;
 let bright = 100;
 
@@ -89,19 +90,20 @@ function setup() {
   video = createCapture(VIDEO);
   video.hide();
 
-  poseNet = ml5.poseNet(video, () => {
-    console.log('Ready!')
-    modelStatus = "ready";
-  });
-  poseNet.on('pose', (results) => {
-    poses = results
-    for (let simPerson of simPeople) {
-      poses.push({ pose: { keypoints: [{ score: 1, position: { x: simPerson.x, y: simPerson.y } }] } })
+  if(webcams){
+    poseNet = ml5.poseNet(video, () => {
+      console.log('Ready!')
+      modelStatus = "ready";
+    });
+    poseNet.on('pose', (results) => {
+      poses = results
+      for (let simPerson of simPeople) {
+        poses.push({ pose: { keypoints: [{ score: 1, position: { x: simPerson.x, y: simPerson.y } }] } })
 
-    }
-    //todo: add centroid here
-  });
-
+      }
+      //todo: add centroid here
+    });
+  }
 
   background(0);
 
@@ -127,12 +129,14 @@ function setup() {
 
 
 function draw() {
-  // poses = [];
+  if(!webcams){
+    poses = [];
 
-  // for (let simPerson of simPeople) {
-  //   poses.push({pose: {keypoints: [{score: 1, position: {x: simPerson.x, y: simPerson.y}}]}})
+    for (let simPerson of simPeople) {
+      poses.push({pose: {keypoints: [{score: 1, position: {x: simPerson.x, y: simPerson.y}}]}})
 
-  // }
+    }
+  }
 
 
 
@@ -152,8 +156,8 @@ function draw() {
 
   }
 
-  if (modelStatus == "ready") {
-    if (vid_loaded && state == 2) {
+  if (modelStatus == "ready" || !webcams) {
+    if (vid_loaded && stateNames[state] == "triangulation") {
       tint((globalHue + 50) % 360, 100, 50)
       image(vid, 0, 0)
     }

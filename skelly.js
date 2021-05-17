@@ -4,7 +4,12 @@ function run_skelly() {
   for (let p of poses) {
     for (let keypoint of p.pose.keypoints) {
       if (keypoint.score > poseThreshold) {
-          fill(255);
+          if(keypoint.score==1){
+            fill(360, 100, 100)
+          } else {
+
+            fill(255);
+          }
           ellipse(keypoint.position.x, keypoint.position.y, 40);
         }
       }

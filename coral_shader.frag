@@ -98,7 +98,7 @@ void mainImage(out vec4 O, vec2 u){
 
       }
       
-      n += smoothstep(0.0, 1.0, map(smallestDistance, coral_disturb_dist, 0.0, 0.0, 1.0));
+      n += smoothstep(0.0, 1.0, map(smallestDistance, coral_disturb_dist, 0.0, 0.5, 1.0));
       
       O.x = n*n*n;
     }  
