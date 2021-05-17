@@ -1,5 +1,6 @@
 
 function run_skelly() {
+  image(video, 0, 0);
   for (let p of poses) {
     for (let keypoint of p.pose.keypoints) {
       if (keypoint.score > poseThreshold) {

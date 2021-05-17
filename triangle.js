@@ -26,7 +26,7 @@ class Point {
     this.viableSpot = true;
     for (let p of points) {
       let d = ((this.x-p.x)*(this.x-p.x)) + ((this.y-p.y)*(this.y-p.y));
-      if (d < 2000) {
+      if (d < 200) {
         this.viableSpot = false;
         return;
       }

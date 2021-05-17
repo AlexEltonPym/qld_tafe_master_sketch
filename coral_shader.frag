@@ -107,7 +107,7 @@ void mainImage(out vec4 O, vec2 u){
 void main() {
   mainImage(gl_FragColor,gl_FragCoord.xy);
   if(gl_FragColor.x > 0.0){
-       gl_FragColor = vec4(hsb2rgb(vec3((globalHue/360.0) + map(gl_FragColor.x, 0.0, 1.0, 0.0, hueRange/360.0), 1.0, 1.0)), gl_FragColor.x);
+    gl_FragColor = vec4(hsb2rgb(vec3(mod(globalHue + map(gl_FragColor.x, 0.0, 1.0, 0.0, hueRange), 360.0) / 360.0, 1.0, 1.0)), gl_FragColor.x);
   } else {
      gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
   }

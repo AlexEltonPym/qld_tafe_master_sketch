@@ -5,7 +5,7 @@ function run_coral(){
         for (let keypoint of p.pose.keypoints) {
           if (keypoint.score > poseThreshold) {
               coral_keypoints_x.push(keypoint.position.x);
-              coral_keypoints_y.push(keypoint.position.y);
+              coral_keypoints_y.push(map(keypoint.position.y, 0, height, 2*height, 0));
           }
         }
     }
