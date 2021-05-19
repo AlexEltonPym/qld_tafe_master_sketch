@@ -50,7 +50,7 @@ let coral_keypoints_x = [];
 let coral_keypoints_y = [];
 
 let state = 0;
-let stateNames = ['skelly', 'walkers', 'triangulation', 'coral'];
+let stateNames = ['walkers', 'triangulation', 'coral'];
 let left_transition = 0;
 let right_transition = 0;
 let transitioning = false;
@@ -81,6 +81,8 @@ function preload() {
 function setup() {
   //small screen 10x10, 192x108
   //big screen is 18x20 which at 192x108 would be 3456x2160
+  //1536 512
+
   createCanvas(screen=="small"?1920:3456, screen=="small"?1080:2160, WEBGL);
   frameRate(30);
   for (let i = 0; i < simPeopleCount; i++) {
