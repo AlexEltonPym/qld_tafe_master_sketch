@@ -48,8 +48,12 @@ const coral_grid_scale = 40;
 const coral_disturb_dist = 400;
 let coral_keypoints_x = [];
 let coral_keypoints_y = [];
+let polyps = [];
+const coral_polyp_fade_rate = 0.02;
+const polyp_spawn_offset = 100;
+const polyp_spawn_seperation_sq = 200;
 
-let state = 0;
+let state = 2;
 let stateNames = ['walkers', 'triangulation', 'coral'];
 let left_transition = 0;
 let right_transition = 0;
@@ -83,7 +87,7 @@ function setup() {
   //big screen is 18x20 which at 192x108 would be 3456x2160
   //1536 512
 
-  createCanvas(screen=="small"?1920:3456, screen=="small"?1080:2160, WEBGL);
+  createCanvas(screen=="small"?1920:1920, screen=="small"?1080:1080, WEBGL);
   frameRate(30);
   for (let i = 0; i < simPeopleCount; i++) {
     simPeople.push({ x: random(width), y: random(height) })
