@@ -74,7 +74,7 @@ function preload() {
   coral_shader = loadShader('coral_base.vert', 'coral_shader.frag');
 
 
-  vid = createVideo('short_bg_video.mp4', () => {
+  vid = createVideo('full_bg_video.mp4', () => {
     vid_loaded = true
     vid.hide();
     vid.loop();
